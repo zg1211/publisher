@@ -12,20 +12,19 @@ var (
 	tokenWaitTimeout = 3 * time.Second
 )
 
-type Producer struct {
+type publisher struct {
 	c     mqtt.Client
 	topic string
 }
 
-func NewProducer(client mqtt.Client, topic string) (*Producer, error) {
-	return &Producer{
-		c:     client,
-		topic: topic,
+func NewPublisher(client mqtt.Client) (*publisher, error) {
+	return &publisher{
+		c: client,
 	}, nil
 }
 
-func (p *Producer) Publish(msg []byte) error {
-	token := p.c.Publish(p.topic, qos, retained, msg)
+func (p *publisher) Publish(topic string, msg []byte) error {
+	token := p.c.Publish(topic, qos, retained, msg)
 	if token.WaitTimeout(tokenWaitTimeout); token.Error() != nil {
 		return token.Error()
 	}
